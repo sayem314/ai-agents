@@ -20,6 +20,23 @@ Sign in on the **host** first so config dirs exist:
 
 Mount paths must target `/root/...` in the container (see [Authentication](authentication.md)).
 
+## `codex`: executable file not found in $PATH
+
+Your alias mounts `~/.codex` for auth, which must **not** replace the Linux Codex binary baked into the image. Older images installed Codex under `/root/.codex/packages/…`, so the mount hid the binary (and host macOS binaries would not run anyway).
+
+**Fix:** pull a current image after the install-path fix lands on Hub:
+
+```bash
+docker pull sayem314/ai-agents:codex
+```
+
+Until then, rebuild locally:
+
+```bash
+make build TOOL=codex LANG=full
+# then use ai-agents-codex-full:latest in your alias instead of sayem314/ai-agents:codex
+```
+
 ## Command not found inside container
 
 Images install CLIs to `/root/.local/bin`. Do not use `--user "$(id -u):$(id -g)"` — non-root users cannot access that path.

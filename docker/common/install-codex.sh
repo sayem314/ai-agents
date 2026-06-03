@@ -16,8 +16,8 @@ esac
 
 PKG="codex-package-${TARGET}.tar.gz"
 BASE="https://github.com/openai/codex/releases/download/rust-v${VERSION}"
-CODEX_HOME="${CODEX_HOME:-/root/.codex}"
-STANDALONE_ROOT="${CODEX_HOME}/packages/standalone"
+# Install outside ~/.codex — that dir is bind-mounted from the host at runtime for auth.
+STANDALONE_ROOT="/opt/codex/packages/standalone"
 RELEASE_DIR="${STANDALONE_ROOT}/releases/${VERSION}-${TARGET}"
 CURRENT_LINK="${STANDALONE_ROOT}/current"
 BIN_DIR="/root/.local/bin"
