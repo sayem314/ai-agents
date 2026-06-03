@@ -8,17 +8,36 @@ Published images: [`sayem314/ai-agents`](https://hub.docker.com/r/sayem314/ai-ag
 
 1. Install [Docker](https://docs.docker.com/get-docker/).
 2. Sign in to each tool on your **host** once (`~/.codex`, `~/.claude`, etc.).
-3. Add an alias to `~/.zshrc` or `~/.bashrc` (pick your tool):
+3. Add aliases to `~/.zshrc` or `~/.bashrc` (pick one or more tools):
 
 ```bash
 # Codex
-alias codex='docker run -it --rm -w /workspace -v "$PWD:/workspace" -v "$HOME/.codex:/root/.codex" -v "$HOME/.config/codex:/root/.config/codex" sayem314/ai-agents:codex --sandbox danger-full-access'
+alias codex='docker run -it --rm -w /workspace \
+  -v "$PWD:/workspace" \
+  -v "$HOME/.codex:/root/.codex" \
+  -v "$HOME/.config/codex:/root/.config/codex" \
+  sayem314/ai-agents:codex --sandbox danger-full-access'
+
+# Claude Code
+alias claude-code='docker run -it --rm -w /workspace \
+  -v "$PWD:/workspace" \
+  -v "$HOME/.claude:/root/.claude" \
+  -v "$HOME/.config/claude:/root/.config/claude" \
+  sayem314/ai-agents:claude-code --dangerously-skip-permissions'
+alias claude='claude-code'
+
+# OpenCode
+alias opencode='docker run -it --rm -w /workspace \
+  -v "$PWD:/workspace" \
+  -v "$HOME/.config/opencode:/root/.config/opencode" \
+  -v "$HOME/.local/share/opencode:/root/.local/share/opencode" \
+  sayem314/ai-agents:opencode'
 ```
 
 4. Run from any project:
 
 ```bash
-cd ~/my-app && codex
+cd ~/my-app && codex          # or: claude-code / opencode
 ```
 
 More aliases, language variants, and options → **[Documentation](docs/README.md)**
