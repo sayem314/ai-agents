@@ -67,6 +67,15 @@ Workflow: [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
 - Publishes only when Hub is missing or stale; use **force** on manual dispatch to rebuild everything
 - Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`
 
+**Docker Hub setup (GitHub → Settings → Secrets and variables → Actions):**
+
+| Name                 | Type         | Value                                                                                                                     |
+| -------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `DOCKERHUB_TOKEN`    | **Secret**   | Docker Hub [access token](https://hub.docker.com/settings/security) with **Read & Write** (value only, e.g. `dckr_pat_…`) |
+| `DOCKERHUB_USERNAME` | **Variable** | Hub username (e.g. `sayem314`)                                                                                            |
+
+Do not use your Docker Hub account password or a GitHub PAT. `DOCKERHUB_TOKEN` is only used in the **publish** job for `docker login`; the plan job reads public tag metadata without it. A previous `HTTP 401` in the plan job was a script bug (sending the PAT as a Bearer token), not an invalid secret.
+
 Version sources: Codex `openai/codex` (`rust-vX.Y.Z`), Claude `anthropics/claude-code` (`vX.Y.Z`), OpenCode `anomalyco/opencode` (`vX.Y.Z`).
 
 Each publish emits a **floating tag** (e.g. `codex`) and a **version suffix tag** (e.g. `codex-0.136.0`). See [Images](images.md).

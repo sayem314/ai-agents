@@ -51,30 +51,24 @@ latest_semver_tag() {
     | tail -1
 }
 
+# List tags from the public Hub API. Do not send DOCKERHUB_TOKEN here — Hub PATs are
+# for docker login (password), not Authorization: Bearer (that always returns 401).
 hub_tags() {
   local page=1
   local tags=""
-  local auth=()
-  if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then
-    auth=(-H "Authorization: Bearer ${DOCKERHUB_TOKEN}")
-  fi
   while true; do
     local resp chunk next code
-    resp="$(curl -sSL "${auth[@]}" -w '\n%{http_code}' \
+    resp="$(curl -sSL -w '\n%{http_code}' \
       "https://hub.docker.com/v2/repositories/${REGISTRY}/tags?page_size=100&page=${page}")"
     code="$(echo "$resp" | tail -1)"
     resp="$(echo "$resp" | sed '$d')"
-    if [[ "$code" == "403" ]]; then
-      if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then
-        echo "hub tags API HTTP 403 (check DOCKERHUB_TOKEN)" >&2
-        return 1
-      fi
-      return 0
-    fi
     if [[ "$code" == "404" ]]; then
       return 0
     fi
-    [[ "$code" =~ ^2 ]] || { echo "hub tags API HTTP ${code}" >&2; return 1; }
+    [[ "$code" =~ ^2 ]] || {
+      echo "hub tags API HTTP ${code} for ${REGISTRY}" >&2
+      return 1
+    }
     chunk="$(echo "$resp" | jq -r '.results[].name // empty')"
     [[ -n "$chunk" ]] || break
     tags+=$'\n'"$chunk"
