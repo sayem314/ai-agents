@@ -103,7 +103,7 @@ Variables: `TOOL`, `LANG`, `TAG`, `REGISTRY` (default `sayem314/ai-agents`), `PL
 docker/
   common/install-agent-deps.sh   # shared apt packages
   common/install-codex.sh        # Codex tarball install
-  common/install-node-tooling.sh # pnpm + bun (versions pinned in script)
+  common/install-node-tooling.sh # latest pnpm + bun for node/full layers
   common/publish-plan.sh         # upstream vs Hub version check
   langs/{node,python,go,rust,full}/Dockerfile
   tools/{codex,claude,opencode}/Dockerfile + entrypoint.sh

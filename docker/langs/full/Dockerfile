@@ -1,10 +1,5 @@
 # ai-agents-lang-full — all stacks via official images (multi-stage) + agent deps
 # Tag: ai-agents-lang-full:latest
-FROM node:24-bookworm AS node
-ENV PATH="/root/.bun/bin:${PATH}"
-COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
-RUN bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
-
 FROM golang:1.26-bookworm AS go
 
 FROM rust:1-bookworm AS rust
@@ -18,9 +13,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     UV_VERSION=0.11.18 \
     GOPATH=/go \
     RUSTUP_HOME=/usr/local/rustup \
-    CARGO_HOME=/usr/local/cargo
-
-ENV PATH="/usr/local/bin:/root/.bun/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
+    CARGO_HOME=/usr/local/cargo \
+    PATH="/usr/local/bin:/root/.bun/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
@@ -29,14 +23,13 @@ RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
     && apt-get install -y --no-install-recommends clang lld \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=node /usr/local/bin/node /usr/local/bin/node
-COPY --from=node /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node /usr/local/bin/npx /usr/local/bin/npx
-COPY --from=node /usr/local/bin/corepack /usr/local/bin/corepack
-COPY --from=node /usr/local/bin/pnpm /usr/local/bin/pnpm
-COPY --from=node /usr/local/bin/pnpx /usr/local/bin/pnpx
-COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=node /root/.bun /root/.bun
+COPY --from=node:24-bookworm /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:24-bookworm /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node:24-bookworm /usr/local/bin/npx /usr/local/bin/npx
+COPY --from=node:24-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
+
+COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
+RUN bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
 
 COPY --from=go /usr/local/go /usr/local/go
 RUN mkdir -p /go/bin

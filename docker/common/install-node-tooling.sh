@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-# Node tooling: pnpm (corepack) + bun official installer.
+# Node tooling: latest pnpm (npm global) + latest bun (official installer).
 set -euo pipefail
 
-PNPM_VERSION="${PNPM_VERSION:-11.5.1}"
-BUN_VERSION="${BUN_VERSION:-1.3.14}"
+npm install -g pnpm@latest
+curl -fsSL https://bun.sh/install | bash
 
-corepack enable
-corepack prepare "pnpm@${PNPM_VERSION}" --activate
-curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
+export PATH="/root/.bun/bin:${PATH}"
 
 command -v node >/dev/null
 command -v npm >/dev/null
