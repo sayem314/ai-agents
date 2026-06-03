@@ -29,8 +29,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GOPATH=/go \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    JAVA_HOME=/opt/java/openjdk \
-    PATH="/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${JAVA_HOME}/bin:/opt/apache-maven-3.9.15/bin:/opt/gradle-9.5.1/bin:${PATH}"
+    JAVA_HOME=/opt/java/openjdk
+
+# JAVA_HOME must be set before PATH; BuildKit does not expand ${JAVA_HOME} in the same ENV line.
+ENV PATH="/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:/opt/java/openjdk/bin:/opt/apache-maven-3.9.15/bin:/opt/gradle-9.5.1/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
