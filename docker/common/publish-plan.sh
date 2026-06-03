@@ -39,7 +39,8 @@ latest_codex() {
     | grep -E '^rust-v[0-9]+\.[0-9]+\.[0-9]+$' \
     | sed 's/^rust-v//' \
     | sort -V \
-    | tail -1
+    | tail -1 \
+    || true
 }
 
 latest_semver_tag() {
@@ -48,7 +49,8 @@ latest_semver_tag() {
     | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
     | sed 's/^v//' \
     | sort -V \
-    | tail -1
+    | tail -1 \
+    || true
 }
 
 # List tags from the public Hub API. Do not send DOCKERHUB_TOKEN here — Hub PATs are
@@ -85,7 +87,8 @@ hub_max_version() {
     | grep -E "^${prefix}-[0-9]+\\.[0-9]+\\.[0-9]+$" \
     | sed "s/^${prefix}-//" \
     | sort -V \
-    | tail -1
+    | tail -1 \
+    || true
 }
 
 needs_publish() {
