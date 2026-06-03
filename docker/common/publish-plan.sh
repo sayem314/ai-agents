@@ -130,7 +130,7 @@ declare -a MATRIX_ENTRIES=()
 PLAN_JSON='[]'
 
 add_tool() {
-  local tool="$1" upstream="$2" hub_max="$3" hub_prefix="$4"
+  local tool="$1" upstream="$2" hub_max="$3"
   if ! needs_publish "$upstream" "$hub_max"; then
     echo "${tool}: up to date (${upstream}, hub: ${hub_max:-none})"
     return 0
@@ -147,9 +147,9 @@ add_tool() {
   done
 }
 
-add_tool codex "$CODEX_UPSTREAM" "$CODEX_HUB" codex
-add_tool claude "$CLAUDE_UPSTREAM" "$CLAUDE_HUB" claude-code
-add_tool opencode "$OPENCODE_UPSTREAM" "$OPENCODE_HUB" opencode
+add_tool codex "$CODEX_UPSTREAM" "$CODEX_HUB"
+add_tool claude "$CLAUDE_UPSTREAM" "$CLAUDE_HUB"
+add_tool opencode "$OPENCODE_UPSTREAM" "$OPENCODE_HUB"
 
 if [[ "${#MATRIX_ENTRIES[@]}" -gt 0 ]]; then
   MATRIX="$(printf '%s\n' "${MATRIX_ENTRIES[@]}" | jq -sc '{include:.}')"
@@ -171,8 +171,5 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
     echo "plan<<EOF"
     echo "$PLAN_JSON"
     echo "EOF"
-    echo "codex_version=${CODEX_UPSTREAM}"
-    echo "claude_version=${CLAUDE_UPSTREAM}"
-    echo "opencode_version=${OPENCODE_UPSTREAM}"
   } >> "$GITHUB_OUTPUT"
 fi

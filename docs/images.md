@@ -6,7 +6,7 @@ Multi-arch: `linux/amd64` and `linux/arm64`.
 
 ## Tag scheme
 
-Images are **not** published as a single `:latest` for the whole repo. Each variant gets a **tool-based tag name** (floating / “latest” for that line) and, when the CLI version is pinned in the Dockerfile, a **version suffix tag** on the same image.
+Images are **not** published as a single `:latest` for the whole repo. Each variant gets a **tool-based tag name** (floating / “latest” for that line) and, when a CLI version is passed at build time, a **version suffix tag** on the same image.
 
 ```
 sayem314/ai-agents:<tool>[-<lang>][-<cli-version>]
@@ -21,7 +21,7 @@ sayem314/ai-agents:<tool>[-<lang>][-<cli-version>]
 
 Claude uses the tag `claude-code` (not `claude`) for the default full image.
 
-Version suffix tags are emitted only when `ARG *_VERSION` is set in `docker/tools/<tool>/Dockerfile` (Codex is pinned today; Claude/OpenCode get version tags once their ARG is set).
+Version suffix tags are emitted when `*_VERSION` is set at build time (Dockerfile default, `make publish CODEX_VERSION=…`, or the Publish workflow). Local `make bake` without version args only pushes floating tags for Claude and OpenCode.
 
 ## Full matrix (18 published tags)
 
