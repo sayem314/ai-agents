@@ -1,0 +1,22 @@
+# Daily upstream check + publish for Codex images (5 language variants).
+# Version source: https://github.com/openai/codex/tags (rust-vX.Y.Z stable)
+
+name: Publish Codex
+
+on:
+  schedule:
+    # Daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Publish all Codex variants even if Hub is up to date
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-tool.yml
+    with:
+      tool: codex
+      force: ${{ github.event_name == 'workflow_dispatch' && inputs.force || false }}

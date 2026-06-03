@@ -1,31 +1,26 @@
-# Publishes multi-arch images to Docker Hub when upstream stable > Hub (or tag missing).
-#
-# Version sources:
-#   Codex:     https://github.com/openai/codex/tags (rust-vX.Y.Z stable)
-#   Claude:    https://github.com/anthropics/claude-code/tags (vX.Y.Z)
-#   OpenCode:  https://github.com/anomalyco/opencode/tags (vX.Y.Z)
-#
-# Hub tags: floating (codex, claude-code, …) + pinned (codex-0.136.0, …)
+# Reusable publish workflow for one tool (5 language variants, sequential).
 #
 # Required repo configuration:
 #   Secrets:  DOCKERHUB_TOKEN
 #   Variables: DOCKERHUB_USERNAME (e.g. sayem314)
 
-name: Publish
+name: Publish tool
 
 on:
-  schedule:
-    # Daily — check upstream vs Docker Hub
-    - cron: "0 6 * * *"
-  workflow_dispatch:
+  workflow_call:
     inputs:
+      tool:
+        description: codex, claude, or opencode
+        required: true
+        type: string
       force:
-        description: Publish all tools even if Hub is up to date
+        description: Publish even if Docker Hub is up to date
+        required: false
         type: boolean
         default: false
 
 concurrency:
-  group: publish-docker-hub
+  group: publish-${{ inputs.tool }}
   cancel-in-progress: false
 
 permissions:
@@ -34,10 +29,11 @@ permissions:
 env:
   REGISTRY: sayem314/ai-agents
   PLATFORMS: linux/amd64,linux/arm64
+  TOOL: ${{ inputs.tool }}
 
 jobs:
   plan:
-    name: Check versions
+    name: Check versions (${{ inputs.tool }})
     runs-on: ubuntu-latest
     outputs:
       publish: ${{ steps.plan.outputs.publish }}
@@ -50,23 +46,19 @@ jobs:
         id: plan
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.force }}" == "true" ]]; then
-            export FORCE=true
-          else
-            export FORCE=false
-          fi
-          bash docker/common/publish-plan.sh
+          TOOL: ${{ inputs.tool }}
+          FORCE: ${{ inputs.force && 'true' || 'false' }}
+        run: bash docker/common/publish-plan.sh
 
       - name: Summary
         run: |
-          echo "### Publish plan" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Publish plan (${{ inputs.tool }})" >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           echo '${{ steps.plan.outputs.plan }}' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   publish:
-    name: ${{ matrix.tool }}-${{ matrix.lang }}
+    name: ${{ matrix.lang }}
     needs: plan
     if: needs.plan.outputs.publish == 'true'
     runs-on: ubuntu-latest
@@ -89,12 +81,12 @@ jobs:
 
       - name: Publish image
         env:
-          CODEX_VERSION: ${{ matrix.tool == 'codex' && matrix.version || '' }}
-          CLAUDE_VERSION: ${{ matrix.tool == 'claude' && matrix.version || '' }}
-          OPENCODE_VERSION: ${{ matrix.tool == 'opencode' && matrix.version || '' }}
+          CODEX_VERSION: ${{ inputs.tool == 'codex' && matrix.version || '' }}
+          CLAUDE_VERSION: ${{ inputs.tool == 'claude' && matrix.version || '' }}
+          OPENCODE_VERSION: ${{ inputs.tool == 'opencode' && matrix.version || '' }}
         run: |
           make publish \
-            TOOL=${{ matrix.tool }} \
+            TOOL=${{ inputs.tool }} \
             LANG=${{ matrix.lang }} \
             REGISTRY=${{ env.REGISTRY }} \
             PLATFORMS="${{ env.PLATFORMS }}" \

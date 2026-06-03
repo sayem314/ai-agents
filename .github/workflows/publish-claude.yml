@@ -1,0 +1,22 @@
+# Daily upstream check + publish for Claude Code images (5 language variants).
+# Version source: https://github.com/anthropics/claude-code/tags (vX.Y.Z)
+
+name: Publish Claude
+
+on:
+  schedule:
+    # Daily at 10:00 UTC
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Publish all Claude variants even if Hub is up to date
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-tool.yml
+    with:
+      tool: claude
+      force: ${{ github.event_name == 'workflow_dispatch' && inputs.force || false }}

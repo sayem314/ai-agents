@@ -5,8 +5,18 @@ set -euo pipefail
 
 REGISTRY="${REGISTRY:-sayem314/ai-agents}"
 FORCE="${FORCE:-false}"
+TOOL="${TOOL:-}"
 GITHUB_API="${GITHUB_API:-https://api.github.com}"
 LANGS=(node python go rust full)
+
+should_run_tool() {
+  [[ -z "$TOOL" || "$TOOL" == "$1" ]]
+}
+
+if [[ -n "$TOOL" && "$TOOL" != "codex" && "$TOOL" != "claude" && "$TOOL" != "opencode" ]]; then
+  echo "invalid TOOL: ${TOOL} (expected codex, claude, or opencode)" >&2
+  exit 1
+fi
 
 curl_gh() {
   local url="$1"
@@ -111,17 +121,30 @@ require_upstream() {
   fi
 }
 
-CODEX_UPSTREAM="$(latest_codex)"
-CLAUDE_UPSTREAM="$(latest_semver_tag "anthropics/claude-code")"
-OPENCODE_UPSTREAM="$(latest_semver_tag "anomalyco/opencode")"
+CODEX_UPSTREAM=""
+CLAUDE_UPSTREAM=""
+OPENCODE_UPSTREAM=""
+CODEX_HUB=""
+CLAUDE_HUB=""
+OPENCODE_HUB=""
 
-require_upstream codex "$CODEX_UPSTREAM"
-require_upstream claude "$CLAUDE_UPSTREAM"
-require_upstream opencode "$OPENCODE_UPSTREAM"
+if should_run_tool codex; then
+  CODEX_UPSTREAM="$(latest_codex)"
+  require_upstream codex "$CODEX_UPSTREAM"
+  CODEX_HUB="$(hub_max_version "codex")"
+fi
 
-CODEX_HUB="$(hub_max_version "codex")"
-CLAUDE_HUB="$(hub_max_version "claude-code")"
-OPENCODE_HUB="$(hub_max_version "opencode")"
+if should_run_tool claude; then
+  CLAUDE_UPSTREAM="$(latest_semver_tag "anthropics/claude-code")"
+  require_upstream claude "$CLAUDE_UPSTREAM"
+  CLAUDE_HUB="$(hub_max_version "claude-code")"
+fi
+
+if should_run_tool opencode; then
+  OPENCODE_UPSTREAM="$(latest_semver_tag "anomalyco/opencode")"
+  require_upstream opencode "$OPENCODE_UPSTREAM"
+  OPENCODE_HUB="$(hub_max_version "opencode")"
+fi
 
 declare -a MATRIX_ENTRIES=()
 PLAN_JSON='[]'
@@ -144,9 +167,15 @@ add_tool() {
   done
 }
 
-add_tool codex "$CODEX_UPSTREAM" "$CODEX_HUB"
-add_tool claude "$CLAUDE_UPSTREAM" "$CLAUDE_HUB"
-add_tool opencode "$OPENCODE_UPSTREAM" "$OPENCODE_HUB"
+if should_run_tool codex; then
+  add_tool codex "$CODEX_UPSTREAM" "$CODEX_HUB"
+fi
+if should_run_tool claude; then
+  add_tool claude "$CLAUDE_UPSTREAM" "$CLAUDE_HUB"
+fi
+if should_run_tool opencode; then
+  add_tool opencode "$OPENCODE_UPSTREAM" "$OPENCODE_HUB"
+fi
 
 if [[ "${#MATRIX_ENTRIES[@]}" -gt 0 ]]; then
   MATRIX="$(printf '%s\n' "${MATRIX_ENTRIES[@]}" | jq -sc '{include:.}')"

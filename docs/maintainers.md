@@ -60,12 +60,17 @@ CODEX_VERSION=0.136.0 make publish TOOL=codex LANG=full
 
 ### Automated publish (GitHub Actions)
 
-Workflow: [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
+Three workflows share [`.github/workflows/publish-tool.yml`](../.github/workflows/publish-tool.yml):
 
-- Runs daily (06:00 UTC) and on manual dispatch
-- [`docker/common/publish-plan.sh`](../docker/common/publish-plan.sh) fetches latest stable versions from GitHub and compares to max pinned tags on Docker Hub
-- Publishes only when Hub is missing or stale; use **force** on manual dispatch to rebuild everything
-- Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`
+| Workflow             | File                                                                | Schedule (UTC) |
+| -------------------- | ------------------------------------------------------------------- | -------------- |
+| **Publish Codex**    | [`publish-codex.yml`](../.github/workflows/publish-codex.yml)       | Daily 06:00    |
+| **Publish Claude**   | [`publish-claude.yml`](../.github/workflows/publish-claude.yml)     | Daily 10:00    |
+| **Publish OpenCode** | [`publish-opencode.yml`](../.github/workflows/publish-opencode.yml) | Daily 14:00    |
+
+Each run checks one tool only via `TOOL=…` in [`docker/common/publish-plan.sh`](../docker/common/publish-plan.sh), compares GitHub stable vs max pinned tags on Docker Hub, and publishes five language variants sequentially when stale. Manual dispatch supports **force** to rebuild that tool even if Hub is up to date.
+
+Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`.
 
 **Docker Hub setup (GitHub → Settings → Secrets and variables → Actions):**
 
