@@ -118,6 +118,7 @@ docker/
   common/install-agent-deps.sh   # shared apt packages
   common/install-codex.sh        # Codex tarball install
   common/install-node-tooling.sh # latest pnpm + bun for node/full layers
+  common/install-playwright.sh   # Playwright CLI + Chromium (full layer only)
   common/publish-plan.sh         # upstream vs Hub version check
   langs/{node,python,go,rust,full}/Dockerfile
   tools/{codex,claude,opencode}/Dockerfile

@@ -41,7 +41,7 @@ Each language layer is built on official Docker Hub base images plus shared agen
 | **python** | `python:3.14-bookworm`                                                 | uv                                     |
 | **go**     | `golang:1.26-bookworm`                                                 | —                                      |
 | **rust**   | `rust:1-bookworm`                                                      | clang, lld                             |
-| **full**   | Multi-stage copy of node, python, go, rust into `python:3.14-bookworm` | All stacks                             |
+| **full**   | Multi-stage copy of node, python, go, rust into `python:3.14-bookworm` | All stacks, Playwright CLI + Chromium  |
 
 ## Which variant to pick
 
@@ -54,6 +54,8 @@ Each language layer is built on official Docker Hub base images plus shared agen
 | Rust crate                     | `*-rust`                                     |
 
 Full images are larger but work everywhere. Language-specific images pull faster and use less disk.
+
+**Playwright** (`playwright` CLI, Chromium + OS deps) is included only on **full** tags (`codex`, `claude-code`, `opencode`), not on `*-node`, `*-python`, etc.
 
 ## Pull manually
 

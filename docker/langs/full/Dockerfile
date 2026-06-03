@@ -38,10 +38,14 @@ RUN mkdir -p /go/bin
 COPY --from=rust /usr/local/cargo /usr/local/cargo
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 
+COPY docker/common/install-playwright.sh /tmp/install-playwright.sh
+RUN bash /tmp/install-playwright.sh && rm /tmp/install-playwright.sh
+
 RUN node --version && npm --version && pnpm --version && bun --version \
     && python3 --version | grep -qE '^Python 3\.14\.' \
     && go version \
     && rustc --version && cargo --version \
-    && uv --version
+    && uv --version \
+    && playwright --version
 
 LABEL org.opencontainers.image.title="ai-agents-lang-full"
