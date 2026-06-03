@@ -18,6 +18,9 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      DOCKERHUB_TOKEN:
+        required: true
 
 concurrency:
   group: publish-${{ inputs.tool }}

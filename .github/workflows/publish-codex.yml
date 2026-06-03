@@ -17,6 +17,7 @@ on:
 jobs:
   publish:
     uses: ./.github/workflows/publish-tool.yml
+    secrets: inherit
     with:
       tool: codex
       force: ${{ github.event_name == 'workflow_dispatch' && inputs.force || false }}
