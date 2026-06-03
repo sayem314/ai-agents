@@ -30,7 +30,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     JAVA_HOME=/opt/java/openjdk \
-    PATH="/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:/opt/apache-maven-3.9.15/bin:/opt/gradle-9.5.1/bin:${PATH}"
+    PATH="/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${JAVA_HOME}/bin:/opt/apache-maven-3.9.15/bin:/opt/gradle-9.5.1/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
