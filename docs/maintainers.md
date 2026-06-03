@@ -72,8 +72,6 @@ Each run checks one tool only via `TOOL=…` in [`docker/common/publish-plan.sh`
 
 Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`.
 
-Hub **overview/readme** is synced from [`README.md`](../README.md) by [`.github/workflows/dockerhub-readme.yml`](../.github/workflows/dockerhub-readme.yml) (push to `main` or manual dispatch). Image publish alone does not update it.
-
 **Docker Hub setup (GitHub → Settings → Secrets and variables → Actions):**
 
 | Name                 | Type         | Value                                                                                                                     |
@@ -81,7 +79,7 @@ Hub **overview/readme** is synced from [`README.md`](../README.md) by [`.github/
 | `DOCKERHUB_TOKEN`    | **Secret**   | Docker Hub [access token](https://hub.docker.com/settings/security) with **Read & Write** (value only, e.g. `dckr_pat_…`) |
 | `DOCKERHUB_USERNAME` | **Variable** | Hub username (e.g. `sayem314`)                                                                                            |
 
-Do not use your Docker Hub account password or a GitHub PAT. `DOCKERHUB_TOKEN` is only used in the **publish** job for `docker login`; the plan job reads public tag metadata without it. A previous `HTTP 401` in the plan job was a script bug (sending the PAT as a Bearer token), not an invalid secret.
+Do not use your Docker Hub account password or a GitHub PAT. `DOCKERHUB_TOKEN` is only used in the **publish** job for `docker login`; the plan job reads public tag metadata without it.
 
 Version sources: Codex `openai/codex` (`rust-vX.Y.Z`), Claude `anthropics/claude-code` (`vX.Y.Z`), OpenCode `anomalyco/opencode` (`vX.Y.Z`).
 
