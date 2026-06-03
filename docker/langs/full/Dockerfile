@@ -1,7 +1,9 @@
 # ai-agents-lang-full — all stacks via official images (multi-stage) + agent deps
 # Tag: ai-agents-lang-full:latest
 FROM node:24-bookworm AS node
-RUN corepack enable && corepack prepare pnpm@11.5.0 --activate
+ENV PATH="/root/.bun/bin:${PATH}"
+COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
+RUN bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
 
 FROM golang:1.26-bookworm AS go
 
@@ -18,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo
 
-ENV PATH="/usr/local/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
+ENV PATH="/usr/local/bin:/root/.bun/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
@@ -34,6 +36,7 @@ COPY --from=node /usr/local/bin/corepack /usr/local/bin/corepack
 COPY --from=node /usr/local/bin/pnpm /usr/local/bin/pnpm
 COPY --from=node /usr/local/bin/pnpx /usr/local/bin/pnpx
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node /root/.bun /root/.bun
 
 COPY --from=go /usr/local/go /usr/local/go
 RUN mkdir -p /go/bin
@@ -41,10 +44,10 @@ RUN mkdir -p /go/bin
 COPY --from=rust /usr/local/cargo /usr/local/cargo
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 
-RUN node --version \
+RUN node --version && npm --version && pnpm --version && bun --version \
     && python3 --version | grep -qE '^Python 3\.14\.' \
     && go version \
     && rustc --version && cargo --version \
-    && uv --version && pnpm --version
+    && uv --version
 
 LABEL org.opencontainers.image.title="ai-agents-lang-full"

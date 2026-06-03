@@ -35,13 +35,13 @@ Version suffix tags are emitted when `*_VERSION` is set at build time (Dockerfil
 
 Each language layer is built on official Docker Hub base images plus shared agent deps (git, curl, build tools).
 
-| Lang       | Base image                                                | Extra tooling              |
-| ---------- | --------------------------------------------------------- | -------------------------- |
-| **node**   | `node:24-bookworm`                                        | pnpm via corepack          |
-| **python** | `python:3.14-bookworm`                                    | uv                         |
-| **go**     | `golang:1.26-bookworm`                                    | —                          |
-| **rust**   | `rust:1-bookworm`                                         | clang, lld                 |
-| **full**   | Multi-stage copy of node, python, go, rust into `python:3.14-bookworm` | All stacks                 |
+| Lang       | Base image                                                             | Extra tooling                      |
+| ---------- | ---------------------------------------------------------------------- | ---------------------------------- |
+| **node**   | `node:24-bookworm`                                                     | node, npm, pnpm 11.5.1, bun 1.3.14 |
+| **python** | `python:3.14-bookworm`                                                 | uv                                 |
+| **go**     | `golang:1.26-bookworm`                                                 | —                                  |
+| **rust**   | `rust:1-bookworm`                                                      | clang, lld                         |
+| **full**   | Multi-stage copy of node, python, go, rust into `python:3.14-bookworm` | All stacks                         |
 
 ## Which variant to pick
 
