@@ -58,6 +58,8 @@ COPY --from=java /opt/apache-maven-3.9.15 /opt/apache-maven-3.9.15
 COPY --from=java /opt/gradle-9.5.1 /opt/gradle-9.5.1
 
 RUN node --version && python3 --version && go version \
-    && rustc --version && java -version
+    && rustc --version && cargo --version \
+    && java -version && mvn -version && gradle -version \
+    && uv --version && pnpm --version
 
 LABEL org.opencontainers.image.title="ai-agents-lang-full"
