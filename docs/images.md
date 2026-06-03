@@ -6,20 +6,22 @@ Multi-arch: `linux/amd64` and `linux/arm64`.
 
 ## Tag scheme
 
+Images are **not** published as a single `:latest` for the whole repo. Each variant gets a **tool-based tag name** (floating / “latest” for that line) and, when the CLI version is pinned in the Dockerfile, a **version suffix tag** on the same image.
+
 ```
-sayem314/ai-agents:<tool>[-<lang>]
+sayem314/ai-agents:<tool>[-<lang>][-<cli-version>]
 ```
 
-| Pattern         | Example                            | Stack                    |
-| --------------- | ---------------------------------- | ------------------------ |
-| `<tool>`        | `codex`, `claude-code`, `opencode` | **full** — all languages |
-| `<tool>-node`   | `codex-node`                       | Node.js only             |
-| `<tool>-python` | `claude-python`                    | Python only              |
-| `<tool>-go`     | `opencode-go`                      | Go only                  |
-| `<tool>-rust`   | `codex-rust`                       | Rust only                |
-| `<tool>-java`   | `claude-java`                      | Java only                |
+| Pattern                   | Example                            | Meaning                         |
+| ------------------------- | ---------------------------------- | ------------------------------- |
+| `<tool>`                  | `codex`, `claude-code`, `opencode` | **full** stack, floating CLI    |
+| `<tool>-<lang>`           | `codex-node`, `claude-python`      | Single lang stack, floating CLI |
+| `<tool>-<cli-version>`    | `codex-0.136.0`                    | **full**, pinned Codex version  |
+| `<tool>-<lang>-<version>` | `codex-node-0.136.0`               | Single lang, pinned CLI version |
 
 Claude uses the tag `claude-code` (not `claude`) for the default full image.
+
+Version suffix tags are emitted only when `ARG *_VERSION` is set in `docker/tools/<tool>/Dockerfile` (Codex is pinned today; Claude/OpenCode get version tags once their ARG is set).
 
 ## Full matrix (18 published tags)
 
@@ -59,6 +61,7 @@ Full images are larger but work everywhere. Language-specific images pull faster
 
 ```bash
 docker pull sayem314/ai-agents:codex
+docker pull sayem314/ai-agents:codex-0.136.0
 docker pull sayem314/ai-agents:claude-code
 docker pull sayem314/ai-agents:opencode
 docker pull sayem314/ai-agents:codex-node

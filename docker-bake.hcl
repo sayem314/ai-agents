@@ -9,6 +9,18 @@ variable "TAG" {
   default = "latest"
 }
 
+variable "CODEX_VERSION" {
+  default = ""
+}
+
+variable "CLAUDE_VERSION" {
+  default = ""
+}
+
+variable "OPENCODE_VERSION" {
+  default = ""
+}
+
 function "lang_tag" {
   params = [lang]
   result = "ai-agents-lang-${lang}:${TAG}"
@@ -21,9 +33,26 @@ function "hub_tag" {
   )
 }
 
+function "tool_version" {
+  params = [tool]
+  result = tool == "codex" ? CODEX_VERSION : (
+    tool == "claude" ? CLAUDE_VERSION : OPENCODE_VERSION
+  )
+}
+
+function "hub_tag_names" {
+  params = [tool, lang]
+  result = tool_version(tool) != "" ? [
+    hub_tag(tool, lang),
+    "${hub_tag(tool, lang)}-${tool_version(tool)}",
+  ] : [hub_tag(tool, lang)]
+}
+
 function "tool_tags" {
   params = [tool, lang]
-  result = REGISTRY != "" ? ["${REGISTRY}:${hub_tag(tool, lang)}"] : ["ai-agents-${tool}-${lang}:${TAG}"]
+  result = REGISTRY != "" ? [
+    for name in hub_tag_names(tool, lang) : "${REGISTRY}:${name}"
+  ] : ["ai-agents-${tool}-${lang}:${TAG}"]
 }
 
 group "default" {
@@ -82,6 +111,11 @@ target "matrix" {
   dockerfile = "docker/tools/${tool}/Dockerfile"
   contexts = {
     lang = "target:lang-${lang}"
+  }
+  args = {
+    CODEX_VERSION    = CODEX_VERSION
+    CLAUDE_VERSION   = CLAUDE_VERSION
+    OPENCODE_VERSION = OPENCODE_VERSION
   }
   tags       = tool_tags(tool, lang)
   depends_on = ["lang-${lang}"]

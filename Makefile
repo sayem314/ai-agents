@@ -2,6 +2,8 @@
 
 SHELL := /bin/bash
 
+include docker/tool-versions.mk
+
 TOOLS    := codex claude opencode
 LANGS    := node python go rust java full
 TAG      ?= latest
@@ -61,9 +63,12 @@ else
 endif
 
 # Multi-arch push for one Hub tag (amd64 + arm64 in parallel within that build).
+# Hub tags: floating name (e.g. codex, codex-node) + optional version suffix when pinned.
 publish:
 	@test -n "$(TOOL)" && test -n "$(LANG)" || (echo "TOOL and LANG are required" && exit 1)
-	REGISTRY=$(REGISTRY) TAG=$(TAG) docker buildx bake -f $(BAKE_FILE) \
+	REGISTRY=$(REGISTRY) TAG=$(TAG) \
+		CODEX_VERSION=$(CODEX_VERSION) CLAUDE_VERSION=$(CLAUDE_VERSION) OPENCODE_VERSION=$(OPENCODE_VERSION) \
+		docker buildx bake -f $(BAKE_FILE) \
 		--set "*.platform=$(PLATFORMS)" \
 		--push \
 		$(TOOL)-$(LANG)

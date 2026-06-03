@@ -2,6 +2,8 @@
 # Build: make build TOOL=claude LANG=full
 FROM lang
 
+ARG CLAUDE_VERSION=
+
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Native installer places `claude` in ~/.local/bin
