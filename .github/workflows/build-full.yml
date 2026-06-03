@@ -1,0 +1,29 @@
+name: Build (full)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-full-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.tool }}-full
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        tool: [codex, claude, opencode]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build image
+        run: make build TOOL=${{ matrix.tool }} LANG=full

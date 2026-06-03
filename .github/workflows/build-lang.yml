@@ -1,0 +1,30 @@
+name: Build (lang)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-lang-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.tool }}-${{ matrix.lang }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [codex, claude, opencode]
+        lang: [node, python, go, rust, java]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build image
+        run: make build TOOL=${{ matrix.tool }} LANG=${{ matrix.lang }}
