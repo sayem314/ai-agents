@@ -72,6 +72,8 @@ Each run checks one tool only via `TOOL=…` in [`docker/common/publish-plan.sh`
 
 Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`.
 
+Hub **overview/readme** is synced from [`README.md`](../README.md) by [`.github/workflows/dockerhub-readme.yml`](../.github/workflows/dockerhub-readme.yml) (push to `main` or manual dispatch). Image publish alone does not update it.
+
 **Docker Hub setup (GitHub → Settings → Secrets and variables → Actions):**
 
 | Name                 | Type         | Value                                                                                                                     |

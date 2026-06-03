@@ -1,0 +1,32 @@
+# Sync GitHub README.md to the Docker Hub repository overview.
+# Image push (publish-*.yml) does not update Hub description/readme.
+
+name: Docker Hub README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - .github/workflows/dockerhub-readme.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readme:
+    name: Update Hub overview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Push README to Docker Hub
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: sayem314/ai-agents
+          readme-filepath: ./README.md
+          enable-url-completion: true
+          short-description: Codex, Claude Code, and OpenCode in Docker — mount project and subscription auth.
