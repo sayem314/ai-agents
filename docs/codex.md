@@ -56,7 +56,6 @@ Smaller images with one language stack. Same auth mounts; only the image tag cha
 | `codex-python` | `sayem314/ai-agents:codex-python` |
 | `codex-go`     | `sayem314/ai-agents:codex-go`     |
 | `codex-rust`   | `sayem314/ai-agents:codex-rust`   |
-| `codex-java`   | `sayem314/ai-agents:codex-java`   |
 
 Example:
 

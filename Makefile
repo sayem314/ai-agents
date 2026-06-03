@@ -5,7 +5,7 @@ SHELL := /bin/bash
 include docker/tool-versions.mk
 
 TOOLS    := codex claude opencode
-LANGS    := node python go rust java full
+LANGS    := node python go rust full
 TAG      ?= latest
 REGISTRY ?= sayem314/ai-agents
 PLATFORMS ?= linux/amd64,linux/arm64
@@ -27,7 +27,7 @@ help:
 	@echo "  make build TOOL=codex LANG=full"
 	@echo ""
 	@echo "Matrix (buildx, one image at a time, current arch):"
-	@echo "  make bake                  All 18 tool images, sequential"
+	@echo "  make bake                  All 15 tool images, sequential"
 	@echo "  make bake TARGET=codex-full   One target"
 	@echo ""
 	@echo "Publish (buildx, multi-arch $(PLATFORMS) per image, sequential):"

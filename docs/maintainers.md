@@ -27,7 +27,7 @@ docker run -it --rm -v "$PWD:/workspace" ai-agents-codex-full:latest --help
 Builds one tool image at a time (lang layer pulled in as a bake dependency). Current machine arch only — results stay in buildx cache unless you use `make build` with `--load`.
 
 ```bash
-make bake                  # all 18, one by one
+make bake                  # all 15, one by one
 make bake TARGET=codex-full   # one target
 ```
 
@@ -35,11 +35,11 @@ make bake TARGET=codex-full   # one target
 
 Requires [buildx](https://docs.docker.com/build/building/multi-platform/) and `docker login`.
 
-Each publish builds **amd64 + arm64 in parallel** for that single Hub tag, then pushes. `publish-all` runs 18 publishes **one tag at a time** (avoids hammering GitHub during CLI installs).
+Each publish builds **amd64 + arm64 in parallel** for that single Hub tag, then pushes. `publish-all` runs 15 publishes **one tag at a time** (avoids hammering GitHub during CLI installs).
 
 ```bash
 make publish TOOL=codex LANG=full    # one tag, multi-arch
-make publish-all                     # all 18 tags, sequential
+make publish-all                     # all 15 tags, sequential
 ```
 
 Default platforms: `linux/amd64,linux/arm64`. Override:
@@ -90,10 +90,10 @@ Full matrix: [Images](images.md).
 | `make help`                       | List targets and variables                   |
 | `make build-lang LANG=node`       | Build one language layer                     |
 | `make build TOOL=codex LANG=full` | Build one tool image (local docker)          |
-| `make bake`                       | All 18 tool images via buildx, one at a time |
+| `make bake`                       | All 15 tool images via buildx, one at a time |
 | `make bake TARGET=codex-full`     | One tool image via buildx                    |
 | `make publish TOOL=… LANG=…`      | Multi-arch build + push one Hub tag          |
-| `make publish-all`                | Push all 18 Hub tags, one at a time          |
+| `make publish-all`                | Push all 15 Hub tags, one at a time          |
 
 Variables: `TOOL`, `LANG`, `TAG`, `REGISTRY` (default `sayem314/ai-agents`), `PLATFORMS`, `CODEX_VERSION`, `CLAUDE_VERSION`, `OPENCODE_VERSION`.
 
@@ -104,7 +104,7 @@ docker/
   common/install-agent-deps.sh   # shared apt packages
   common/install-codex.sh        # Codex tarball install
   common/publish-plan.sh         # upstream vs Hub version check
-  langs/{node,python,go,rust,java,full}/Dockerfile
+  langs/{node,python,go,rust,full}/Dockerfile
   tools/{codex,claude,opencode}/Dockerfile + entrypoint.sh
 docker-bake.hcl                  # buildx bake matrix
 Makefile
@@ -118,7 +118,6 @@ Makefile
 | python | `python:3.14-bookworm`                        |
 | go     | `golang:1.26-bookworm`                        |
 | rust   | `rust:1-bookworm`                             |
-| java   | `eclipse-temurin:25-jdk`                      |
 | full   | Multi-stage merge into `python:3.14-bookworm` |
 
 ### Tool install

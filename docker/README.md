@@ -14,17 +14,17 @@ docker/
   tool-versions.mk Pinned CLI versions (env overrides for publish)
 ```
 
-Repo root also has `docker-bake.hcl` (18-image buildx matrix) and `Makefile` (local build / bake / publish).
+Repo root also has `docker-bake.hcl` (15-image buildx matrix) and `Makefile` (local build / bake / publish).
 
 ## Two-layer build
 
-1. **Lang layer** — `docker/langs/{node,python,go,rust,java,full}/Dockerfile`  
+1. **Lang layer** — `docker/langs/{node,python,go,rust,full}/Dockerfile`  
    Official base images + shared agent deps (git, curl, build tools, stack-specific tooling).
 
 2. **Tool layer** — `docker/tools/{codex,claude,opencode}/Dockerfile`  
    Installs the CLI on top of a lang layer via build context `lang`. Entrypoints add default sandbox/permission flags.
 
-**3 tools × 6 langs = 18 published Hub tags.** Lang layers stay local/cache-only; only tool tags are pushed.
+**3 tools × 5 langs = 15 published Hub tags.** Lang layers stay local/cache-only; only tool tags are pushed.
 
 ## Quick build
 
@@ -48,5 +48,5 @@ Multi-arch publish and the full matrix: see [Maintainers](../docs/maintainers.md
 | ---------------------------------------------------------- | --------------------------------------------- |
 | [GitHub repository](https://github.com/sayem314/ai-agents) | Source, issues, CI workflows                  |
 | [Maintainers](../docs/maintainers.md)                      | Build, bake, publish, automated Hub updates   |
-| [Images](../docs/images.md)                                | All 18 Hub tags and language stacks           |
+| [Images](../docs/images.md)                                | All 15 Hub tags and language stacks           |
 | [README](../README.md)                                     | End-user quick start (pull and run, no clone) |

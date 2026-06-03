@@ -1,4 +1,4 @@
-# Build matrix: 3 tools × 6 language variants = 18 published images.
+# Build matrix: 3 tools × 5 language variants = 15 published images.
 # Lang layers are build-only deps; tool images push to REGISTRY with hub tags.
 
 variable "REGISTRY" {
@@ -87,13 +87,6 @@ target "lang-rust" {
   output     = ["type=cacheonly"]
 }
 
-target "lang-java" {
-  context    = "."
-  dockerfile = "docker/langs/java/Dockerfile"
-  tags       = [lang_tag("java")]
-  output     = ["type=cacheonly"]
-}
-
 target "lang-full" {
   context    = "."
   dockerfile = "docker/langs/full/Dockerfile"
@@ -104,7 +97,7 @@ target "lang-full" {
 target "matrix" {
   matrix = {
     tool = ["codex", "claude", "opencode"]
-    lang = ["node", "python", "go", "rust", "java", "full"]
+    lang = ["node", "python", "go", "rust", "full"]
   }
   name       = "${tool}-${lang}"
   context    = "."

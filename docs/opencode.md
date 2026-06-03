@@ -53,7 +53,6 @@ OpenCode has no extra sandbox flag — Docker is the isolation boundary.
 | `opencode-python` | `sayem314/ai-agents:opencode-python` |
 | `opencode-go`     | `sayem314/ai-agents:opencode-go`     |
 | `opencode-rust`   | `sayem314/ai-agents:opencode-rust`   |
-| `opencode-java`   | `sayem314/ai-agents:opencode-java`   |
 
 Example:
 

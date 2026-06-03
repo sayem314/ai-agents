@@ -56,7 +56,6 @@ The image entrypoint adds `--dangerously-skip-permissions` if you omit it.
 | `claude-python` | `sayem314/ai-agents:claude-python` |
 | `claude-go`     | `sayem314/ai-agents:claude-go`     |
 | `claude-rust`   | `sayem314/ai-agents:claude-rust`   |
-| `claude-java`   | `sayem314/ai-agents:claude-java`   |
 
 Example:
 

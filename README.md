@@ -30,7 +30,7 @@ More aliases, language variants, and options → **[Documentation](docs/README.m
 | [Codex](docs/codex.md)                     | Aliases, sandbox flags, `-node` / `-python` / … variants |
 | [Claude Code](docs/claude-code.md)         | Aliases, permission flags, language variants             |
 | [OpenCode](docs/opencode.md)               | Aliases, language variants                               |
-| [Images](docs/images.md)                   | All 18 tags, language stacks, which variant to pick      |
+| [Images](docs/images.md)                   | All 15 tags, language stacks, which variant to pick      |
 | [Authentication](docs/authentication.md)   | Subscription login, API keys, git/SSH                    |
 | [Security](docs/security.md)               | What Docker protects (and what it does not)              |
 | [Troubleshooting](docs/troubleshooting.md) | Pull, login, permissions, macOS mounts                   |
@@ -45,4 +45,4 @@ More aliases, language variants, and options → **[Documentation](docs/README.m
 | `opencode`                       | `sayem314/ai-agents:opencode`      |
 | `codex-node`, `claude-python`, … | `sayem314/ai-agents:<tool>-<lang>` |
 
-Default tags use the **full** language stack. Use `-node`, `-python`, `-go`, `-rust`, or `-java` for smaller images.
+Default tags use the **full** language stack. Use `-node`, `-python`, `-go`, or `-rust` for smaller images.

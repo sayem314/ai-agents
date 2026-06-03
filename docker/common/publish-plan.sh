@@ -6,7 +6,7 @@ set -euo pipefail
 REGISTRY="${REGISTRY:-sayem314/ai-agents}"
 FORCE="${FORCE:-false}"
 GITHUB_API="${GITHUB_API:-https://api.github.com}"
-LANGS=(node python go rust java full)
+LANGS=(node python go rust full)
 
 curl_gh() {
   local url="$1"
