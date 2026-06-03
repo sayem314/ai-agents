@@ -45,6 +45,9 @@ build:
 	$(MAKE) build-lang LANG=$(LANG) TAG=$(TAG)
 	docker build \
 		--build-context lang=docker-image://$(call lang_image,$(LANG)) \
+		--build-arg CODEX_VERSION=$(CODEX_VERSION) \
+		--build-arg CLAUDE_VERSION=$(CLAUDE_VERSION) \
+		--build-arg OPENCODE_VERSION=$(OPENCODE_VERSION) \
 		-t $(call image_name,$(TOOL),$(LANG)) \
 		-f docker/tools/$(TOOL)/Dockerfile .
 

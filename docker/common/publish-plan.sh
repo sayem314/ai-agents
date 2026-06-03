@@ -64,7 +64,14 @@ hub_tags() {
       "https://hub.docker.com/v2/repositories/${REGISTRY}/tags?page_size=100&page=${page}")"
     code="$(echo "$resp" | tail -1)"
     resp="$(echo "$resp" | sed '$d')"
-    if [[ "$code" == "404" || "$code" == "403" ]]; then
+    if [[ "$code" == "403" ]]; then
+      if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then
+        echo "hub tags API HTTP 403 (check DOCKERHUB_TOKEN)" >&2
+        return 1
+      fi
+      return 0
+    fi
+    if [[ "$code" == "404" ]]; then
       return 0
     fi
     [[ "$code" =~ ^2 ]] || { echo "hub tags API HTTP ${code}" >&2; return 1; }
@@ -99,9 +106,21 @@ needs_publish() {
   [[ "$(printf '%s\n%s\n' "$hub_max" "$upstream" | sort -V | tail -1)" == "$upstream" && "$hub_max" != "$upstream" ]]
 }
 
+require_upstream() {
+  local tool="$1" version="$2"
+  if [[ -z "$version" ]]; then
+    echo "${tool}: failed to resolve upstream version" >&2
+    exit 1
+  fi
+}
+
 CODEX_UPSTREAM="$(latest_codex)"
 CLAUDE_UPSTREAM="$(latest_semver_tag "anthropics/claude-code")"
 OPENCODE_UPSTREAM="$(latest_semver_tag "anomalyco/opencode")"
+
+require_upstream codex "$CODEX_UPSTREAM"
+require_upstream claude "$CLAUDE_UPSTREAM"
+require_upstream opencode "$OPENCODE_UPSTREAM"
 
 CODEX_HUB="$(hub_max_version "codex")"
 CLAUDE_HUB="$(hub_max_version "claude-code")"

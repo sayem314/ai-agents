@@ -8,13 +8,15 @@ FROM golang:1.26-bookworm AS go
 FROM rust:1-bookworm AS rust
 
 FROM eclipse-temurin:25-jdk AS java
+ARG MAVEN_VERSION=3.9.15
+ARG GRADLE_VERSION=9.5.1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl unzip \
     && curl -fsSL \
-        "https://archive.apache.org/dist/maven/maven-3/3.9.15/binaries/apache-maven-3.9.15-bin.tar.gz" \
+        "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz" \
         | tar -xz -C /opt \
     && curl -fsSL \
-        "https://services.gradle.org/distributions/gradle-9.5.1-bin.zip" \
+        "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" \
         -o /tmp/gradle.zip \
     && unzip -q /tmp/gradle.zip -d /opt \
     && rm -rf /var/lib/apt/lists/* /tmp/gradle.zip
@@ -29,10 +31,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GOPATH=/go \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    JAVA_HOME=/opt/java/openjdk
+    JAVA_HOME=/opt/java/openjdk \
+    MAVEN_VERSION=3.9.15 \
+    GRADLE_VERSION=9.5.1
 
 # JAVA_HOME must be set before PATH; BuildKit does not expand ${JAVA_HOME} in the same ENV line.
-ENV PATH="/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:/opt/java/openjdk/bin:/opt/apache-maven-3.9.15/bin:/opt/gradle-9.5.1/bin:${PATH}"
+ENV PATH="/usr/local/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:/opt/java/openjdk/bin:/opt/apache-maven-${MAVEN_VERSION}/bin:/opt/gradle-${GRADLE_VERSION}/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
@@ -56,10 +60,12 @@ COPY --from=rust /usr/local/cargo /usr/local/cargo
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 
 COPY --from=java /opt/java/openjdk /opt/java/openjdk
-COPY --from=java /opt/apache-maven-3.9.15 /opt/apache-maven-3.9.15
-COPY --from=java /opt/gradle-9.5.1 /opt/gradle-9.5.1
+COPY --from=java /opt/apache-maven-${MAVEN_VERSION} /opt/apache-maven-${MAVEN_VERSION}
+COPY --from=java /opt/gradle-${GRADLE_VERSION} /opt/gradle-${GRADLE_VERSION}
 
-RUN node --version && python3 --version && go version \
+RUN node --version \
+    && python3 --version | grep -qE '^Python 3\.14\.' \
+    && go version \
     && rustc --version && cargo --version \
     && java -version && mvn -version && gradle -version \
     && uv --version && pnpm --version

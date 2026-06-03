@@ -50,6 +50,27 @@ PLATFORMS=linux/arm64 make publish TOOL=codex LANG=full
 
 `publish` uses **buildx bake** with `--push`. Language layers are build-only deps and are not pushed.
 
+Pinned CLI versions can be passed on the command line:
+
+```bash
+CODEX_VERSION=0.136.0 make publish TOOL=codex LANG=full
+```
+
+`make build` forwards the same `*_VERSION` variables as `--build-arg`.
+
+### Automated publish (GitHub Actions)
+
+Workflow: [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
+
+- Runs daily (06:00 UTC) and on manual dispatch
+- [`docker/common/publish-plan.sh`](../docker/common/publish-plan.sh) fetches latest stable versions from GitHub and compares to max pinned tags on Docker Hub
+- Publishes only when Hub is missing or stale; use **force** on manual dispatch to rebuild everything
+- Requires repo secret `DOCKERHUB_TOKEN` and variable `DOCKERHUB_USERNAME`
+
+Version sources: Codex `openai/codex` (`rust-vX.Y.Z`), Claude `anthropics/claude-code` (`vX.Y.Z`), OpenCode `anomalyco/opencode` (`vX.Y.Z`).
+
+Each publish emits a **floating tag** (e.g. `codex`) and a **version suffix tag** (e.g. `codex-0.136.0`). See [Images](images.md).
+
 ## Tag mapping
 
 | Local build name          | Docker Hub tag                   |
@@ -74,13 +95,15 @@ Full matrix: [Images](images.md).
 | `make publish TOOL=… LANG=…`      | Multi-arch build + push one Hub tag          |
 | `make publish-all`                | Push all 18 Hub tags, one at a time          |
 
-Variables: `TOOL`, `LANG`, `TAG`, `REGISTRY` (default `sayem314/ai-agents`), `PLATFORMS`.
+Variables: `TOOL`, `LANG`, `TAG`, `REGISTRY` (default `sayem314/ai-agents`), `PLATFORMS`, `CODEX_VERSION`, `CLAUDE_VERSION`, `OPENCODE_VERSION`.
 
 ## Repository layout
 
 ```
 docker/
   common/install-agent-deps.sh   # shared apt packages
+  common/install-codex.sh        # Codex tarball install
+  common/publish-plan.sh         # upstream vs Hub version check
   langs/{node,python,go,rust,java,full}/Dockerfile
   tools/{codex,claude,opencode}/Dockerfile + entrypoint.sh
 docker-bake.hcl                  # buildx bake matrix
@@ -100,13 +123,13 @@ Makefile
 
 ### Tool install
 
-| Tool        | Method                                                          |
-| ----------- | --------------------------------------------------------------- |
-| Codex       | `https://chatgpt.com/codex/install.sh` (pinned `CODEX_VERSION`) |
-| Claude Code | `https://claude.ai/install.sh`                                  |
-| OpenCode    | `https://opencode.ai/install`                                   |
+| Tool        | Method                                                                 | Install path          |
+| ----------- | ---------------------------------------------------------------------- | --------------------- |
+| Codex       | GitHub release tarball via `install-codex.sh` (pinned `CODEX_VERSION`) | `/root/.local/bin`    |
+| Claude Code | `https://claude.ai/install.sh` (pinned `CLAUDE_VERSION` or `stable`)   | `/root/.local/bin`    |
+| OpenCode    | `https://opencode.ai/install` (optional `OPENCODE_VERSION`)            | `/root/.opencode/bin` |
 
-CLIs install to `/root/.local/bin`. Entrypoints inject default sandbox/permission flags.
+Entrypoints inject default sandbox/permission flags.
 
 ## Entrypoints
 

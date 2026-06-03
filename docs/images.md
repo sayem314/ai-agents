@@ -72,7 +72,8 @@ docker pull sayem314/ai-agents:codex-node
 ```
 lang layer (node | python | go | rust | java | full)
     └── tool layer (codex | claude | opencode)
-            └── CLI via official install.sh
+            └── Codex: GitHub release tarball (install-codex.sh)
+            └── Claude / OpenCode: official install scripts
 ```
 
 Language layers are build-only dependencies and are **not** pushed to Docker Hub. Only the 18 tool tags above are published.
