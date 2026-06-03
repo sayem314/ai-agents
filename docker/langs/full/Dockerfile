@@ -1,5 +1,10 @@
 # ai-agents-lang-full — all stacks via official images (multi-stage) + agent deps
 # Tag: ai-agents-lang-full:latest
+FROM node:24-bookworm AS node
+ENV PATH="/root/.bun/bin:${PATH}"
+COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
+RUN bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
+
 FROM golang:1.26-bookworm AS go
 
 FROM rust:1-bookworm AS rust
@@ -14,7 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GOPATH=/go \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    PATH="/usr/local/bin:/root/.bun/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
+    PATH="/usr/local/bin:/usr/local/node-runtime/bin:/root/.bun/bin:/root/.local/bin:/usr/local/go/bin:/go/bin:/usr/local/cargo/bin:${PATH}"
 
 COPY docker/common/install-agent-deps.sh /tmp/install-agent-deps.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
@@ -23,13 +28,9 @@ RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
     && apt-get install -y --no-install-recommends clang lld \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=node:24-bookworm /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:24-bookworm /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node:24-bookworm /usr/local/bin/npx /usr/local/bin/npx
-COPY --from=node:24-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
-
-COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
-RUN bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
+# Full Node tree under a separate prefix — partial bin/lib copies break npm/pnpm shims.
+COPY --from=node /usr/local /usr/local/node-runtime
+COPY --from=node /root/.bun /root/.bun
 
 COPY --from=go /usr/local/go /usr/local/go
 RUN mkdir -p /go/bin
