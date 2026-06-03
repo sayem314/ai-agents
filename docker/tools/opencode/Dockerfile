@@ -4,9 +4,14 @@ FROM lang
 
 ARG OPENCODE_VERSION=
 
-ENV PATH="/root/.local/bin:${PATH}"
+ENV PATH="/root/.opencode/bin:/root/.local/bin:${PATH}"
 
-RUN curl -fsSL https://opencode.ai/install | bash
+RUN set -eux; \
+    if [ -n "${OPENCODE_VERSION}" ]; then \
+        curl -fsSL https://opencode.ai/install | bash -s -- --version "${OPENCODE_VERSION}"; \
+    else \
+        curl -fsSL https://opencode.ai/install | bash; \
+    fi
 
 COPY docker/tools/opencode/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \

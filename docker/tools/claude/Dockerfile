@@ -6,8 +6,13 @@ ARG CLAUDE_VERSION=
 
 ENV PATH="/root/.local/bin:${PATH}"
 
-# Native installer places `claude` in ~/.local/bin
-RUN curl -fsSL https://claude.ai/install.sh | bash
+# install.sh accepts: stable | latest | x.y.z
+RUN set -eux; \
+    if [ -n "${CLAUDE_VERSION}" ]; then \
+        curl -fsSL https://claude.ai/install.sh | bash -s -- "${CLAUDE_VERSION}"; \
+    else \
+        curl -fsSL https://claude.ai/install.sh | bash -s -- stable; \
+    fi
 
 COPY docker/tools/claude/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \

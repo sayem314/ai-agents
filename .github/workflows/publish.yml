@@ -1,8 +1,11 @@
-# Publishes all 18 multi-arch tags to Docker Hub.
+# Publishes multi-arch images to Docker Hub when upstream stable > Hub (or tag missing).
 #
-# Hub tag scheme (repo sayem314/ai-agents):
-#   Floating:  codex, claude-code, opencode, codex-node, …
-#   Pinned:    codex-0.136.0, codex-node-0.136.0, … (when CLI version set in Dockerfile)
+# Version sources:
+#   Codex:     https://github.com/openai/codex/tags (rust-vX.Y.Z stable)
+#   Claude:    https://github.com/anthropics/claude-code/tags (vX.Y.Z)
+#   OpenCode:  https://github.com/anomalyco/opencode/tags (vX.Y.Z)
+#
+# Hub tags: floating (codex, claude-code, …) + pinned (codex-0.136.0, …)
 #
 # Required repo configuration:
 #   Secrets:  DOCKERHUB_TOKEN
@@ -12,9 +15,14 @@ name: Publish
 
 on:
   schedule:
-    # Weekly — Sunday 06:00 UTC
-    - cron: "0 6 * * 0"
+    # Daily — check upstream vs Docker Hub
+    - cron: "0 6 * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: Publish all tools even if Hub is up to date
+        type: boolean
+        default: false
 
 concurrency:
   group: publish-docker-hub
@@ -28,16 +36,46 @@ env:
   PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
+  plan:
+    name: Check versions
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.plan.outputs.publish }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      plan: ${{ steps.plan.outputs.plan }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve upstream vs Docker Hub
+        id: plan
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.force }}" == "true" ]]; then
+            export FORCE=true
+          else
+            export FORCE=false
+          fi
+          bash docker/common/publish-plan.sh
+
+      - name: Summary
+        run: |
+          echo "### Publish plan" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo '${{ steps.plan.outputs.plan }}' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
   publish:
     name: ${{ matrix.tool }}-${{ matrix.lang }}
+    needs: plan
+    if: needs.plan.outputs.publish == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 1
-      matrix:
-        tool: [codex, claude, opencode]
-        lang: [node, python, go, rust, java, full]
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v6
 
@@ -51,4 +89,16 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish image
-        run: make publish TOOL=${{ matrix.tool }} LANG=${{ matrix.lang }} REGISTRY=${{ env.REGISTRY }} PLATFORMS="${{ env.PLATFORMS }}"
+        env:
+          CODEX_VERSION: ${{ matrix.tool == 'codex' && matrix.version || '' }}
+          CLAUDE_VERSION: ${{ matrix.tool == 'claude' && matrix.version || '' }}
+          OPENCODE_VERSION: ${{ matrix.tool == 'opencode' && matrix.version || '' }}
+        run: |
+          make publish \
+            TOOL=${{ matrix.tool }} \
+            LANG=${{ matrix.lang }} \
+            REGISTRY=${{ env.REGISTRY }} \
+            PLATFORMS="${{ env.PLATFORMS }}" \
+            CODEX_VERSION="${CODEX_VERSION}" \
+            CLAUDE_VERSION="${CLAUDE_VERSION}" \
+            OPENCODE_VERSION="${OPENCODE_VERSION}"
