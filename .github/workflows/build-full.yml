@@ -25,5 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: ./.github/actions/setup-buildx-mirror
+
       - name: Build image
         run: make build TOOL=${{ matrix.tool }} LANG=full

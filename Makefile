@@ -17,6 +17,13 @@ LANG ?= full
 lang_image  = ai-agents-lang-$(1):$(TAG)
 image_name  = ai-agents-$(1)-$(2):$(TAG)
 
+# GitHub Actions: use buildx so BuildKit mirror config (mirror.gcr.io) applies to base pulls.
+ifdef GITHUB_ACTIONS
+BUILD_CMD = docker buildx build --load
+else
+BUILD_CMD = docker build
+endif
+
 .PHONY: help build-lang build bake publish publish-all
 
 help:
@@ -38,12 +45,12 @@ help:
 
 build-lang:
 	@test -n "$(LANG)" || (echo "LANG is required" && exit 1)
-	docker build -t $(call lang_image,$(LANG)) -f docker/langs/$(LANG)/Dockerfile .
+	$(BUILD_CMD) -t $(call lang_image,$(LANG)) -f docker/langs/$(LANG)/Dockerfile .
 
 build:
 	@test -n "$(TOOL)" && test -n "$(LANG)" || (echo "TOOL and LANG are required" && exit 1)
 	$(MAKE) build-lang LANG=$(LANG) TAG=$(TAG)
-	docker build \
+	$(BUILD_CMD) \
 		--build-context lang=docker-image://$(call lang_image,$(LANG)) \
 		--build-arg CODEX_VERSION=$(CODEX_VERSION) \
 		--build-arg CLAUDE_VERSION=$(CLAUDE_VERSION) \
