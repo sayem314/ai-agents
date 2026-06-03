@@ -17,14 +17,7 @@ LANG ?= full
 lang_image  = ai-agents-lang-$(1):$(TAG)
 image_name  = ai-agents-$(1)-$(2):$(TAG)
 
-# GitHub Actions: use buildx so BuildKit mirror config (mirror.gcr.io) applies to base pulls.
-ifdef GITHUB_ACTIONS
-BUILD_CMD = docker buildx build --load
-else
-BUILD_CMD = docker build
-endif
-
-.PHONY: help build-lang build bake publish publish-all
+.PHONY: help build-lang build build-ci bake publish publish-all
 
 help:
 	@echo "ai-agents — Docker CLI sandboxes for AI coding agents"
@@ -45,18 +38,26 @@ help:
 
 build-lang:
 	@test -n "$(LANG)" || (echo "LANG is required" && exit 1)
-	$(BUILD_CMD) -t $(call lang_image,$(LANG)) -f docker/langs/$(LANG)/Dockerfile .
+	docker build -t $(call lang_image,$(LANG)) -f docker/langs/$(LANG)/Dockerfile .
 
 build:
 	@test -n "$(TOOL)" && test -n "$(LANG)" || (echo "TOOL and LANG are required" && exit 1)
 	$(MAKE) build-lang LANG=$(LANG) TAG=$(TAG)
-	$(BUILD_CMD) \
+	docker build \
 		--build-context lang=docker-image://$(call lang_image,$(LANG)) \
 		--build-arg CODEX_VERSION=$(CODEX_VERSION) \
 		--build-arg CLAUDE_VERSION=$(CLAUDE_VERSION) \
 		--build-arg OPENCODE_VERSION=$(OPENCODE_VERSION) \
 		-t $(call image_name,$(TOOL),$(LANG)) \
 		-f docker/tools/$(TOOL)/Dockerfile .
+
+# CI: buildx bake resolves lang via target:lang-* (docker build --load cannot share
+# images with the docker-container buildx driver across make build steps).
+build-ci:
+	@test -n "$(TOOL)" && test -n "$(LANG)" || (echo "TOOL and LANG are required" && exit 1)
+	TAG=$(TAG) \
+		CODEX_VERSION=$(CODEX_VERSION) CLAUDE_VERSION=$(CLAUDE_VERSION) OPENCODE_VERSION=$(OPENCODE_VERSION) \
+		docker buildx bake -f $(BAKE_FILE) --load $(TOOL)-$(LANG)
 
 # One target via bake, or full matrix one-by-one (lang deps via bake contexts).
 bake:

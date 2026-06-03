@@ -28,4 +28,4 @@ jobs:
       - uses: ./.github/actions/setup-buildx-mirror
 
       - name: Build image
-        run: make build TOOL=${{ matrix.tool }} LANG=full
+        run: make build-ci TOOL=${{ matrix.tool }} LANG=full
