@@ -12,4 +12,7 @@ RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh
 
 RUN go version
 
+COPY docker/common/install-login-path.sh /tmp/install-login-path.sh
+RUN bash /tmp/install-login-path.sh && rm /tmp/install-login-path.sh
+
 LABEL org.opencontainers.image.title="ai-agents-lang-go"

@@ -14,6 +14,9 @@ RUN set -eux; \
     fi \
     && (command -v opencode >/dev/null && opencode --version) || true
 
+COPY docker/common/install-login-path.sh /tmp/install-login-path.sh
+RUN bash /tmp/install-login-path.sh && rm /tmp/install-login-path.sh
+
 WORKDIR /workspace
 ENTRYPOINT ["opencode"]
 CMD []

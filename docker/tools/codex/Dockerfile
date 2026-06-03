@@ -13,6 +13,9 @@ RUN chmod +x /tmp/install-codex.sh \
     && CODEX_VERSION="${CODEX_VERSION}" TARGETARCH="${TARGETARCH}" /tmp/install-codex.sh \
     && rm /tmp/install-codex.sh
 
+COPY docker/common/install-login-path.sh /tmp/install-login-path.sh
+RUN bash /tmp/install-login-path.sh && rm /tmp/install-login-path.sh
+
 WORKDIR /workspace
 ENTRYPOINT ["codex"]
 CMD []

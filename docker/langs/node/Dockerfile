@@ -13,4 +13,7 @@ COPY docker/common/install-node-tooling.sh /tmp/install-node-tooling.sh
 RUN bash /tmp/install-agent-deps.sh && rm /tmp/install-agent-deps.sh \
     && bash /tmp/install-node-tooling.sh && rm /tmp/install-node-tooling.sh
 
+COPY docker/common/install-login-path.sh /tmp/install-login-path.sh
+RUN bash /tmp/install-login-path.sh && rm /tmp/install-login-path.sh
+
 LABEL org.opencontainers.image.title="ai-agents-lang-node"
