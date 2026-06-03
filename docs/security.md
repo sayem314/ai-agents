@@ -31,7 +31,9 @@ Treat the agent like a powerful local developer with full access to the mounted 
 
 ## In-container sandbox flags
 
-| Tool        | Default flag                     | Meaning                                      |
+Images do **not** inject tool flags — add them in your `docker run` alias after the image tag.
+
+| Tool        | Recommended alias flag           | Meaning                                      |
 | ----------- | -------------------------------- | -------------------------------------------- |
 | Codex       | `--sandbox danger-full-access`   | Full shell/tool access inside the container  |
 | Claude Code | `--dangerously-skip-permissions` | Skip permission prompts inside the container |
@@ -39,7 +41,11 @@ Treat the agent like a powerful local developer with full access to the mounted 
 
 Docker is the **outer** sandbox. These flags disable or relax **inner** tool restrictions so agents can run builds, tests, and package installs inside the container.
 
-You can override Codex sandbox by passing your own `--sandbox` flag.
+Example:
+
+```bash
+docker run -it --rm ... sayem314/ai-agents:codex --sandbox danger-full-access
+```
 
 ## Recommendations
 

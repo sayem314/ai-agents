@@ -106,7 +106,7 @@ docker/
   common/install-node-tooling.sh # latest pnpm + bun for node/full layers
   common/publish-plan.sh         # upstream vs Hub version check
   langs/{node,python,go,rust,full}/Dockerfile
-  tools/{codex,claude,opencode}/Dockerfile + entrypoint.sh
+  tools/{codex,claude,opencode}/Dockerfile
 docker-bake.hcl                  # buildx bake matrix
 Makefile
 ```
@@ -129,13 +129,7 @@ Makefile
 | Claude Code | `https://claude.ai/install.sh` (pinned `CLAUDE_VERSION` or `stable`)   | `/root/.local/bin`    |
 | OpenCode    | `https://opencode.ai/install` (optional `OPENCODE_VERSION`)            | `/root/.opencode/bin` |
 
-Entrypoints inject default sandbox/permission flags.
-
-## Entrypoints
-
-- **Codex:** adds `--sandbox danger-full-access` unless already passed
-- **Claude:** adds `--dangerously-skip-permissions` unless already passed
-- **OpenCode:** pass-through only
+Entrypoints are the CLI binaries directly (`ENTRYPOINT ["codex"]`, etc.). Sandbox and permission flags are **not** set by the image — add them in your alias (see tool docs and [Security](security.md)).
 
 ## References
 

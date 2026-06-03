@@ -44,7 +44,7 @@ First run pulls the image if it is not cached locally.
 | `~/.config/codex` → `/root/.config/codex` | Additional Codex config                                              |
 | `--sandbox danger-full-access`            | Full tool access inside the container (Docker is the outer boundary) |
 
-The image entrypoint also injects `--sandbox danger-full-access` if you omit it.
+Pass this flag in your alias — the image does **not** add it for you.
 
 ## Language variants
 

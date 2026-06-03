@@ -13,11 +13,8 @@ RUN chmod +x /tmp/install-codex.sh \
     && CODEX_VERSION="${CODEX_VERSION}" TARGETARCH="${TARGETARCH}" /tmp/install-codex.sh \
     && rm /tmp/install-codex.sh
 
-COPY docker/tools/codex/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 WORKDIR /workspace
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["codex"]
 CMD []
 
 LABEL org.opencontainers.image.title="ai-agents-codex"

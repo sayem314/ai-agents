@@ -22,7 +22,7 @@ Repo root also has `docker-bake.hcl` (15-image buildx matrix) and `Makefile` (lo
    Official base images + shared agent deps (git, curl, build tools, stack-specific tooling).
 
 2. **Tool layer** — `docker/tools/{codex,claude,opencode}/Dockerfile`  
-   Installs the CLI on top of a lang layer via build context `lang`. Entrypoints add default sandbox/permission flags.
+   Installs the CLI on top of a lang layer via build context `lang`. Each tool image sets `ENTRYPOINT` to the CLI binary; pass flags in your `docker run` alias.
 
 **3 tools × 5 langs = 15 published Hub tags.** Lang layers stay local/cache-only; only tool tags are pushed.
 

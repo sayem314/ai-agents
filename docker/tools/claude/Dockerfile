@@ -12,14 +12,11 @@ RUN set -eux; \
         curl -fsSL https://claude.ai/install.sh | bash -s -- "${CLAUDE_VERSION}"; \
     else \
         curl -fsSL https://claude.ai/install.sh | bash -s -- stable; \
-    fi
-
-COPY docker/tools/claude/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh \
+    fi \
     && (command -v claude >/dev/null && claude --version) || true
 
 WORKDIR /workspace
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["claude"]
 CMD []
 
 LABEL org.opencontainers.image.title="ai-agents-claude"

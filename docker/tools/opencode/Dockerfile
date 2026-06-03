@@ -11,14 +11,11 @@ RUN set -eux; \
         curl -fsSL https://opencode.ai/install | bash -s -- --version "${OPENCODE_VERSION}"; \
     else \
         curl -fsSL https://opencode.ai/install | bash; \
-    fi
-
-COPY docker/tools/opencode/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh \
+    fi \
     && (command -v opencode >/dev/null && opencode --version) || true
 
 WORKDIR /workspace
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["opencode"]
 CMD []
 
 LABEL org.opencontainers.image.title="ai-agents-opencode"

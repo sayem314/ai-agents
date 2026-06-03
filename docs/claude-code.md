@@ -46,7 +46,7 @@ First run pulls the image if it is not cached locally.
 | `~/.config/claude` → `/root/.config/claude` | Additional Claude config                                            |
 | `--dangerously-skip-permissions`            | Skip in-container permission prompts (Docker is the outer boundary) |
 
-The image entrypoint adds `--dangerously-skip-permissions` if you omit it.
+Pass this flag in your alias — the image does **not** add it for you.
 
 ## Language variants
 
