@@ -24,7 +24,7 @@ jobs:
         tool: [codex, claude, opencode]
         lang: [node, python, go, rust]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-buildx-mirror
 
